@@ -34,24 +34,6 @@ setup(
     python_requires='~=3.8',
 
     install_requires=[
-        'asf_hyp3',
-        'datetime',
-        'gdal',
-        'getpass',
-        'hyp3_sdk',
-        'IPython',
-        'ipywidgets',
-        'matplotlib',
-        'matplotlib.pyplot',
-        'matplotlib.widgets',
-        'numpy',
-        'osgeo',
-        'pandas',
-        'requests',
-        'subprocess',
-        'sys',
-        'typing',
-        'zipfile',
     ],
 
     extras_require={
