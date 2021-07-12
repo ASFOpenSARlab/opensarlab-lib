@@ -1,0 +1,21 @@
+name: opensarlab_lib
+channels:
+  - conda-forge
+  - default
+dependencies:
+  - python=3.8
+  - pip
+  - ipywidgets
+  - jupyter
+  - kernda
+  - ipython
+  - jupyterthemes
+  - numpy
+  - pandas
+  - matplotlib
+  - gdal
+  - pip:
+    - hyp3-sdk~=1.0
+    - asf_hyp3
+
+
