@@ -1,4 +1,4 @@
-name: opensarlab_lib
+yname: opensarlab_lib
 channels:
   - conda-forge
   - default
@@ -14,6 +14,7 @@ dependencies:
   - pandas
   - matplotlib
   - gdal
+  - pyproj
   - pip:
     - hyp3-sdk~=1.0
     - asf_hyp3

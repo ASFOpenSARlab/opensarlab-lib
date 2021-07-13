@@ -8,6 +8,10 @@ from importlib.metadata import PackageNotFoundError, version
 from .config import TESTING
 from .aoi import AOI_Selector
 from .edl import EarthdataLogin
+from .gdal_wrap import *
+from .products import *
+from .util import *
+from .widgets import *
 
 try:
     __version__ = version(__name__)

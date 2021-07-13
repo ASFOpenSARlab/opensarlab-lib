@@ -1,16 +1,20 @@
 import numpy as np
+from osgeo import gdal
+from pyproj import Transformer
 
 from IPython.display import Markdown, display
 
 import matplotlib.pyplot as plt
 from matplotlib.widgets import RectangleSelector
 
+from opensarlab_lib.gdal_wrap import get_utm
+
 plt.rcParams.update({'font.size': 12})
 
 
 class AOI_Selector:
     def __init__(self,
-                 image,
+                 img_path,
                  fig_xsize=None, fig_ysize=None,
                  cmap=plt.cm.gist_gray,
                  vmin=None, vmax=None
@@ -36,7 +40,9 @@ class AOI_Selector:
             f'<text style=color:darkred>- The square tool icon in the menu is <b>NOT</b> the selection tool. It is the zoom tool.</text>'))
         display(Markdown(
             f'<text style=color:darkred>- If you select any tool, you must toggle it off before you can select an AOI</text>'))
-        self.image = image
+        self.utm = get_utm(img_path)
+        self.img = gdal.Open(img_path)
+        self.image = self.img.ReadAsArray()
         self.x1 = None
         self.y1 = None
         self.x2 = None
@@ -54,7 +60,7 @@ class AOI_Selector:
         else:
             self.fig, self.current_ax = plt.subplots()
         self.fig.suptitle('Area-Of-Interest Selector', fontsize=16)
-        self.current_ax.imshow(self.image, cmap=plt.cm.gist_gray, vmin=self.vmin, vmax=self.vmax)
+        self.current_ax.imshow(self.image, cmap=cmap, vmin=self.vmin, vmax=self.vmax)
 
         def toggle_selector(self, event):
             print(' Key pressed.')
@@ -74,6 +80,15 @@ class AOI_Selector:
                                                               alpha=0.3, fill=True),
                                                interactive=True)
         plt.connect('key_press_event', toggle_selector)
+
+    def get_coords(self, latlon=True):
+        geotrans = self.img.GetGeoTransform()
+        ref_x = geotrans[0] + self.x * geotrans[1]
+        ref_y = geotrans[3] + self.y * geotrans[5]
+        if latlon:
+            transformer = Transformer.from_crs(f"epsg:{self.utm}", "epsg:4326")
+            ref_y, ref_x = transformer.transform(ref_x, ref_y)
+        return [ref_x, ref_y]
 
     def line_select_callback(self, eclick, erelease):
         'eclick and erelease are the press and release events'

@@ -37,7 +37,7 @@ setup(
     ],
 
     extras_require={
-        'develop': [
+        'dev': [
             'pytest',
             'pytest-cov',
         ]
