@@ -11,6 +11,7 @@ from .gdal_wrap import *
 from .hyp3_wrap import *
 from .util import *
 from .widgets import *
+from .product_name_parse import *
 
 try:
     __version__ = version(__name__)
