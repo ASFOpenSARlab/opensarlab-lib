@@ -1,24 +1,22 @@
+import contextlib
 import os
+from pathlib import Path
 import zipfile
+
 
 import matplotlib.pyplot as plt
 import numpy as np
 from osgeo import gdal
 
 
-def path_exists(path: str) -> bool:
-    """
-    Takes a string path, returns true if exists or
-    prints error message and returns false if it doesn't.
-    """
-    assert type(path) == str, 'Error: path must be a string'
-
-    if os.path.exists(path):
-        return True
-    else:
-        print(f"Invalid Path: {path}")
-        return False
-
+@contextlib.contextmanager
+def work_dir(work_pth):
+    cwd = Path.cwd()
+    os.chdir(work_pth)
+    try:
+        yield
+    finally:
+        os.chdir(cwd)
 
 def new_directory(path: str):
     """
@@ -46,8 +44,10 @@ def asf_unzip(output_dir: str, file_path: str):
     assert type(file_path) == str, 'Error: file_path must be a string'
     assert ext == '.zip', 'Error: file_path must be the path of a zip'
 
-    if path_exists(output_dir):
-        if path_exists(file_path):
+    output_dir = Path(output_dir)
+    file_path = Path(file_path)
+    if output_dir.is_dir():
+        if file_path.is_file():
             print(f"Extracting: {file_path}")
             try:
                 zipfile.ZipFile(file_path).extractall(output_dir)
@@ -56,7 +56,7 @@ def asf_unzip(output_dir: str, file_path: str):
             return
 
 
-def get_power_set(my_set, set_size=None):
+def get_power_set(my_set):
     """
     my_set: list or set of strings
     set_size: deprecated, kept as optional for backwards compatibility

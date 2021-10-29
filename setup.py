@@ -8,7 +8,6 @@ with open(os.path.join(_HERE, 'README.md'), 'r') as f:
 
 setup(
     name='opensarlab_lib',
-    use_scm_version=True,
     description="A Python library to support ASF OpenSARlab's Jupyter Notebook repository https://github.com/ASFOpenSARlab/opensarlab-notebooks",
     long_description=long_desc,
     long_description_content_type='text/markdown',
@@ -34,12 +33,22 @@ setup(
     python_requires='~=3.8',
 
     install_requires=[
+        'numpy',
+        'pyproj',
     ],
 
     extras_require={
         'dev': [
+            'asf_hyp3',
+            'hyp3_sdk',
+            'IPython',
+            'ipywidgets',
+            'matplotlib',
+            'osgeo',
+            'pandas',
             'pytest',
             'pytest-cov',
+            'requests',
         ]
     },
 )

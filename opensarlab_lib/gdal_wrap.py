@@ -31,3 +31,7 @@ def get_utm(img_path):
         return results.group(0).split(',')[1][:-2]
     else:
         return None
+
+def get_corner_coords(img_path):
+    info = (gdal.Info(img_path, options=['-json']))
+    return [info['cornerCoordinates']['upperLeft'], info['cornerCoordinates']['lowerRight']]
