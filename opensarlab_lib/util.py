@@ -18,21 +18,6 @@ def work_dir(work_pth):
     finally:
         os.chdir(cwd)
 
-def new_directory(path: str):
-    """
-    Takes a path for a new or existing directory. Creates directory
-    and sub-directories if not already present.
-    """
-    assert type(path) == str
-
-    if os.path.exists(path):
-        print(f"{path} already exists.")
-    else:
-        os.makedirs(path)
-        print(f"Created: {path}")
-    if not os.path.exists(path):
-        print(f"Failed to create path!")
-
 
 def asf_unzip(output_dir: str, file_path: str):
     """
@@ -68,7 +53,7 @@ def get_power_set(my_set):
         for counter in range(0, pow_set_size):
             temp = ""
             for j in range(0, len(my_set)):
-                if(counter & (1 << j) > 0):
+                if counter & (1 << j) > 0:
                     if temp != "":
                         temp = f"{temp} and {my_set[j]}"
                     else:
@@ -78,27 +63,6 @@ def get_power_set(my_set):
     else:
         p_set = set(my_set)
     return p_set
-
-
-def remove_nan_filled_tifs(tif_dir: str, file_names: list):
-    """
-    Takes a path to a directory containing tifs and
-    and a list of the tif filenames.
-    Deletes any tifs containing only NaN values.
-    """
-    assert type(tif_dir) == str, 'Error: tif_dir must be a string'
-    assert len(file_names) > 0, 'Error: file_names must contain at least 1 file name'
-
-    removed = 0
-    for tiff in file_names:
-        raster = gdal.Open(f"{tif_dir}{tiff}")
-        if raster:
-            band = raster.ReadAsArray()
-            if np.count_nonzero(band) < 1:
-                os.remove(f"{tif_dir}{tiff}")
-                removed += 1
-    print(f"GeoTiffs Examined: {len(file_names)}")
-    print(f"GeoTiffs Removed:  {removed}")
 
 
 def input_path(prompt):

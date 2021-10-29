@@ -15,8 +15,8 @@ dependencies:
   - matplotlib
   - gdal
   - pyproj
+  - asf_search
   - pip:
-    - hyp3-sdk~=1.0
-    - asf_hyp3
+    - hyp3-sdk
 
 

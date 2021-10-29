@@ -6,10 +6,9 @@ https://github.com/ASFOpenSARlab/opensarlab-notebooks
 from importlib.metadata import PackageNotFoundError, version
 
 from .config import TESTING
-from .aoi import AOI_Selector
-from .edl import EarthdataLogin
+from .selectors import *
 from .gdal_wrap import *
-from .products import *
+from .hyp3_wrap import *
 from .util import *
 from .widgets import *
 
@@ -23,7 +22,5 @@ except PackageNotFoundError:
           '   python setup.py --version')
 
 __all__ = [
-    'AOI_Selector',
-    'EarthdataLogin',
     '__version__',
 ]

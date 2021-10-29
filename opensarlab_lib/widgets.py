@@ -23,13 +23,14 @@ def gui_date_picker(dates: list) -> widgets.SelectionRangeSlider:
 
 
 def get_slider_vals(selection_range_slider: widgets.SelectionRangeSlider) -> list:
-    '''Returns the minimum and maximum dates retrieved from the
+    """
+    Returns the minimum and maximum dates retrieved from the
     interactive time slider.
 
     Parameters:
     - selection_range_slider: Handle of the interactive time slider
-    '''
-    [a,b] = list(selection_range_slider.value)
+    """
+    [a, b] = list(selection_range_slider.value)
     slider_min = a.to_pydatetime()
     slider_max = b.to_pydatetime()
     return[slider_min, slider_max]
@@ -44,11 +45,12 @@ def select_parameter(things, description=""):
     )
 
 
-def select_mult_parameters(things, description=""):
+def select_mult_parameters(things, description="", width='175px'):
     height = len(things) * 19
     return widgets.SelectMultiple(
         options=things,
         description=description,
         disabled=False,
-        layout=widgets.Layout(height=f"{height}px", width='175px')
+        layout=widgets.Layout(height=f"{height}px", width=width)
     )
+

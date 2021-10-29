@@ -32,6 +32,28 @@ def get_utm(img_path):
     else:
         return None
 
+
 def get_corner_coords(img_path):
     info = (gdal.Info(img_path, options=['-json']))
     return [info['cornerCoordinates']['upperLeft'], info['cornerCoordinates']['lowerRight']]
+
+
+def remove_nan_filled_tifs(tif_dir: str, file_names: list):
+    """
+    Takes a path to a directory containing tifs and
+    and a list of the tif filenames.
+    Deletes any tifs containing only NaN values.
+    """
+    assert type(tif_dir) == str, 'Error: tif_dir must be a string'
+    assert len(file_names) > 0, 'Error: file_names must contain at least 1 file name'
+
+    removed = 0
+    for tiff in file_names:
+        raster = gdal.Open(f"{tif_dir}{tiff}")
+        if raster:
+            band = raster.ReadAsArray()
+            if np.count_nonzero(band) < 1:
+                os.remove(f"{tif_dir}{tiff}")
+                removed += 1
+    print(f"GeoTiffs Examined: {len(file_names)}")
+    print(f"GeoTiffs Removed:  {removed}")
