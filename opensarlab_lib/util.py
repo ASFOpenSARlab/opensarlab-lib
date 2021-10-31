@@ -2,15 +2,20 @@ import contextlib
 import os
 from pathlib import Path
 import zipfile
-
+from typing import List, Set, Dict, Union, Callable
 
 import matplotlib.pyplot as plt
-import numpy as np
-from osgeo import gdal
 
 
 @contextlib.contextmanager
-def work_dir(work_pth):
+def work_dir(work_pth: Union[Path, str]):
+    """
+    Helps avoid directory changes lasting longer than the scope of this function
+
+    Usage:
+    with work_dir(work_pth):
+        do_things()
+    """
     cwd = Path.cwd()
     os.chdir(work_pth)
     try:
@@ -19,21 +24,18 @@ def work_dir(work_pth):
         os.chdir(cwd)
 
 
-def asf_unzip(output_dir: str, file_path: str):
+def asf_unzip(output_dir: Union[Path, str], file_path: Union[Path, str]):
     """
-    Takes an output directory path and a file path to a zipped archive.
+    Takes: an output directory path and a file path to a zipped archive.
     If file is a valid zip, it extracts all to the output directory.
     """
-    ext = os.path.splitext(file_path)[1]
-    assert type(output_dir) == str, 'Error: output_dir must be a string'
-    assert type(file_path) == str, 'Error: file_path must be a string'
-    assert ext == '.zip', 'Error: file_path must be the path of a zip'
-
     output_dir = Path(output_dir)
     file_path = Path(file_path)
+    assert zipfile.is_zipfile(file_path)
+
     if output_dir.is_dir():
-        if file_path.is_file():
-            print(f"Extracting: {file_path}")
+        if file_path.exists():
+            print(f"Extracting: {str(file_path)}")
             try:
                 zipfile.ZipFile(file_path).extractall(output_dir)
             except zipfile.BadZipFile:
@@ -41,23 +43,22 @@ def asf_unzip(output_dir: str, file_path: str):
             return
 
 
-def get_power_set(my_set):
+def get_power_set(my_set: Union[List, Set]) -> Set[str]:
     """
-    my_set: list or set of strings
-    set_size: deprecated, kept as optional for backwards compatibility
-    returns: the power set of input strings
+    Takes: list or set of objects
+    returns: the power set of of objects in my_set as strings
     """
     p_set = set()
     if len(my_set) > 1:
-        pow_set_size = 1 << len(my_set) # 2^n
-        for counter in range(0, pow_set_size):
+        pow_set_size = 1 << len(my_set)  # 2^n
+        for i in range(0, pow_set_size):
             temp = ""
             for j in range(0, len(my_set)):
-                if counter & (1 << j) > 0:
+                if i & (1 << j) > 0:
                     if temp != "":
                         temp = f"{temp} and {my_set[j]}"
                     else:
-                        temp = my_set[j]
+                        temp = str(my_set[j])
                 if temp != "":
                     p_set.add(temp)
     else:
@@ -65,28 +66,31 @@ def get_power_set(my_set):
     return p_set
 
 
-def input_path(prompt):
-    print(f"Current working directory: {os.getcwd()}")
-    print(prompt)
-    return input()
-
-
-def handle_old_data(data_dir, contents):
-    print(f"\n********************** WARNING! **********************")
-    print(f"The directory {data_dir} already exists and contains:")
-    for item in contents:
-        print(f"• {item.split('/')[-1]}")
-    print(f"\n\n[1] Delete old data and continue.")
-    print(f"[2] Save old data and add the data from this analysis to it.")
-    print(f"[3] Save old data and pick a different subdirectory name.")
-    while True:
-        try:
-            selection = int(input("Select option 1, 2, or 3.\n"))
-        except ValueError:
-             continue
-        if selection < 1 or selection > 3:
-             continue
-        return selection
+def handle_old_data(data_dir: Union[Path, str]) -> Union[int, None]:
+    """
+    Takes: path to a directory
+    Checks if directory exists and contains files
+    Inputs user selection for handling any files found
+    Returns: Integer selection for handling existing files
+    """
+    data_dir = Path(data_dir)
+    if data_dir.is_dir():
+        print(f"\n********************** WARNING! **********************")
+        print(f"The directory {data_dir} already exists and contains:")
+        contents = data_dir.glob('*')
+        for item in contents:
+            print(f"• {str(item).split('/')[-1]}")
+        print(f"\n\n[1] Delete old data and continue.")
+        print(f"[2] Save old data and add the data from this analysis to it.")
+        print(f"[3] Save old data and pick a different subdirectory name.")
+        while True:
+            try:
+                selection = int(input("Select option 1, 2, or 3.\n"))
+            except ValueError:
+                continue
+            if selection < 1 or selection > 3:
+                continue
+            return selection
 
 
 #########################
