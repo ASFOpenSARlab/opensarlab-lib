@@ -79,7 +79,7 @@ def get_corner_coords(img_path: Union[Path, str]) -> Union[List[str], None]:
         return None
 
 
-def remove_nan_filled_tifs(tifs: List[Path, str]):
+def remove_nan_filled_tifs(tifs: List[Union[Path, str]]):
     """
     Takes: a list of string or posix paths to the tifs
 
