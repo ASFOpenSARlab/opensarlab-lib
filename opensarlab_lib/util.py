@@ -2,7 +2,7 @@ import contextlib
 import os
 from pathlib import Path
 import zipfile
-from typing import List, Set, Dict, Union, Callable
+from typing import List, Set, Union
 
 import matplotlib.pyplot as plt
 
@@ -10,7 +10,8 @@ import matplotlib.pyplot as plt
 @contextlib.contextmanager
 def work_dir(work_pth: Union[Path, str]):
     """
-    Helps avoid directory changes lasting longer than the scope of this function
+    Temporarily change directories, within the scope of a with statement.
+    Useful when invoking scripts that only input files from the current working directory.
 
     Usage:
     with work_dir(work_pth):
@@ -93,11 +94,6 @@ def handle_old_data(data_dir: Union[Path, str]) -> Union[int, None]:
             return selection
 
 
-#########################
-#  OpenSARlab Functions #
-#########################
-
-
 def jupytertheme_matplotlib_format() -> bool:
     """
     If recognised jupytertheme dark mode is being used,
@@ -115,6 +111,6 @@ def jupytertheme_matplotlib_format() -> bool:
             plt.rcParams.update({'ytick.color': 'lightgrey'})
             return True
     except ModuleNotFoundError:
-        print("jupytertheme not installed")
+        print("jupyterthemes not installed")
         pass
     return False

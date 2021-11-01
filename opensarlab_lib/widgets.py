@@ -27,7 +27,7 @@ def gui_date_picker(dates: list) -> widgets.SelectionRangeSlider:
     return (selection_range_slider)
 
 
-def get_slider_vals(selection_range_slider: widgets.SelectionRangeSlider) -> list:
+def get_slider_vals(selection_range_slider: widgets.SelectionRangeSlider) -> List[datetime.date]:
     """
     Takes: widgets.SelectionRangeSlider of dates
     Returns: a list containing the min and max selected dates from the SelectionRangeSlider

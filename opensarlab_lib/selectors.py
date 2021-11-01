@@ -1,14 +1,10 @@
 import numpy as np
-from osgeo import gdal
-from pyproj import Transformer
+from typing import Optional
 
-from IPython.display import Markdown, display
-
+import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.widgets import RectangleSelector
 import matplotlib.patches as patches
-
-from opensarlab_lib.gdal_wrap import get_utm
 
 plt.rcParams.update({'font.size': 12})
 
@@ -18,33 +14,17 @@ plt.rcParams.update({'font.size': 12})
 ########################
 
 class AOI_Selector:
-    def __init__(self, image,
-                 fig_xsize=None, fig_ysize=None,
-                 cmap=plt.cm.gist_gray,
-                 vmin=None, vmax=None,
-                 drawtype='box'
-                 ):
-        display(Markdown(f"<text style=color:blue><b>Area of Interest Selector Tips:\n</b></text>"))
-        display(Markdown(
-            f'<text style=color:blue>- This plot uses "matplotlib notebook", whereas the other plots in this notebook use "matplotlib inline".</text>'))
-        display(Markdown(
-            f'<text style=color:blue>-  If you run this cell out of sequence and the plot is not interactive, rerun the "%matplotlib notebook" code cell.</text>'))
-        display(Markdown(f'<text style=color:blue>- Use the pan tool to pan with the left mouse button.</text>'))
-        display(Markdown(f'<text style=color:blue>- Use the pan tool to zoom with the right mouse button.</text>'))
-        display(Markdown(
-            f'<text style=color:blue>- You can also zoom with a selection box using the zoom to rectangle tool.</text>'))
-        display(Markdown(
-            f'<text style=color:blue>- To turn off the pan or zoom to rectangle tool so you can select an AOI, click the selected tool button again.</text>'))
+    """
+    Creates an interactive matplotlib plot allowing users
+    to select an area-of-interest with a bounding box
+    """
 
-        display(Markdown(f'<text style=color:darkred><b>IMPORTANT!</b></text>'))
-        display(Markdown(
-            f'<text style=color:darkred>- Upon loading the AOI selector, the selection tool is already active.</text>'))
-        display(Markdown(
-            f'<text style=color:darkred>- Click, drag, and release the left mouse button to select an area.</text>'))
-        display(Markdown(
-            f'<text style=color:darkred>- The square tool icon in the menu is <b>NOT</b> the selection tool. It is the zoom tool.</text>'))
-        display(Markdown(
-            f'<text style=color:darkred>- If you select any tool, you must toggle it off before you can select an AOI</text>'))
+    def __init__(self, image: np.ndarray,
+                 fig_xsize: Optional[float, int] = None, fig_ysize: Optional[float, int] = None,
+                 cmap: Optional[matplotlib.colors.LinearSegmentedColormap] = plt.cm.gist_gray,
+                 vmin: Optional[float, int] = None, vmax: Optional[float, int] = None,
+                 drawtype: Optional[str] = 'box'
+                 ):
         self.image = image
         self.x1 = None
         self.y1 = None
@@ -65,13 +45,16 @@ class AOI_Selector:
         self.fig.suptitle('Area-Of-Interest Selector', fontsize=16)
         self.current_ax.imshow(self.image, cmap=cmap, vmin=self.vmin, vmax=self.vmax)
 
-        def toggle_selector(self, event):
-            print(' Key pressed.')
+        def toggle_selector(event: matplotlib.backend_bases.Event):
+            """
+            Takes: a key press event
+
+            Toggles the selector off if the Pan or Zoom tools are selected.
+            Toggles the selector on if the Pan and Zoom tools are deselected.
+            """
             if event.key in ['Q', 'q'] and toggle_selector.RS.active:
-                print(' RectangleSelector deactivated.')
                 toggle_selector.RS.set_active(False)
             if event.key in ['A', 'a'] and not toggle_selector.RS.active:
-                print(' RectangleSelector activated.')
                 toggle_selector.RS.set_active(True)
 
         toggle_selector.RS = RectangleSelector(self.current_ax, self.line_select_callback,
@@ -84,12 +67,17 @@ class AOI_Selector:
                                                interactive=True)
         plt.connect('key_press_event', toggle_selector)
 
-    def line_select_callback(self, eclick, erelease):
-        'eclick and erelease are the press and release events'
+    def line_select_callback(self,
+                             eclick: matplotlib.backend_bases.Event,
+                             erelease: matplotlib.backend_bases.Event):
+        """
+        Takes: An eclick and erelease event
+
+        Sets self.x1, self.x2, self.y1, and self.y2 from selection corner coordinates
+        """
+
         self.x1, self.y1 = eclick.xdata, eclick.ydata
         self.x2, self.y2 = erelease.xdata, erelease.ydata
-        print("(%3.2f, %3.2f) --> (%3.2f, %3.2f)" % (self.x1, self.y1, self.x2, self.y2))
-        print(" The button you used were: %s %s" % (eclick.button, erelease.button))
 
 
 ##################
@@ -97,10 +85,17 @@ class AOI_Selector:
 ##################
 
 class LineSelector:
-    def __init__(self, image,
-                 fig_xsize=None, fig_ysize=None,
-                 cmap=plt.cm.gist_gray,
-                 vmin=None, vmax=None
+    """
+    Creates an interactive matplotlib plot allowing users
+    to define a line by selecting 2 points
+    """
+
+    def __init__(self, image: np.ndarray,
+                 fig_xsize: Optional[float, int] = None,
+                 fig_ysize: Optional[float, int] = None,
+                 cmap: Optional[matplotlib.colors.LinearSegmentedColormap] = plt.cm.gist_gray,
+                 vmin: Optional[float, int] = None,
+                 vmax: Optional[float, int] = None
                  ):
         self.x1 = None
         self.x2 = None
@@ -120,20 +115,39 @@ class LineSelector:
                                                              self)
         self.cmap = cmap
         self.image = image
-        self.plot = self.gray_plot(self.image, vmin=vmin, vmax=vmax, fig=self.fig, return_ax=True)
+        self.plot = self.gray_plot(self.fig, vmin=vmin, vmax=vmax, return_ax=True)
         self.plot.set_title('Select 2 Points of Interest')
 
-    def gray_plot(self, image, vmin=None, vmax=None, fig=None, return_ax=False):
+    def gray_plot(self,
+                  fig: matplotlib.figure.Figure,
+                  vmin: Optional[float, int] = None,
+                  vmax: Optional[float, int] = None,
+                  return_ax: Optional[bool] = False):
+        """
+        Takes: a matplotlib.figure.Figure object and optional vmin and vmax
+
+        Calculates reasonable vmin, vmax if not passed
+
+        Returns: axes if return_ax == True
+        """
         if vmin is None:
             vmin = np.nanpercentile(self.image, 1)
         if vmax is None:
             vmax = np.nanpercentile(self.image, 99)
         ax = fig.add_axes([0.1, 0.1, 0.8, 0.8])
-        ax.imshow(image, cmap=self.cmap, vmin=vmin, vmax=vmax)
+        ax.imshow(self.image, cmap=self.cmap, vmin=vmin, vmax=vmax)
         if return_ax:
             return (ax)
 
-    def __call__(self, event):
+    def __call__(self, event: matplotlib.backend_bases.Event):
+        """
+        Takes: a click event
+
+        Maintains a stack of 2 points and one line:
+        Adding a new point deletes the line and oldest point, and
+        creates a new line between the new point and the remaining old point.
+        """
+
         self.x1 = event.xdata
         self.y1 = event.ydata
 
