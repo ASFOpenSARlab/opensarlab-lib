@@ -1,5 +1,5 @@
 import numpy as np
-from typing import Optional
+from typing import Optional, Union
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -20,9 +20,9 @@ class AOI_Selector:
     """
 
     def __init__(self, image: np.ndarray,
-                 fig_xsize: Optional[float, int] = None, fig_ysize: Optional[float, int] = None,
+                 fig_xsize: Optional[Union[float, int]] = None, fig_ysize: Optional[Union[float, int]] = None,
                  cmap: Optional[matplotlib.colors.LinearSegmentedColormap] = plt.cm.gist_gray,
-                 vmin: Optional[float, int] = None, vmax: Optional[float, int] = None,
+                 vmin: Optional[Union[float, int]] = None, vmax: Optional[Union[float, int]] = None,
                  drawtype: Optional[str] = 'box'
                  ):
         self.image = image
@@ -91,11 +91,11 @@ class LineSelector:
     """
 
     def __init__(self, image: np.ndarray,
-                 fig_xsize: Optional[float, int] = None,
-                 fig_ysize: Optional[float, int] = None,
+                 fig_xsize: Optional[Union[float, int]] = None,
+                 fig_ysize: Optional[Union[float, int]] = None,
                  cmap: Optional[matplotlib.colors.LinearSegmentedColormap] = plt.cm.gist_gray,
-                 vmin: Optional[float, int] = None,
-                 vmax: Optional[float, int] = None
+                 vmin: Optional[Union[float, int]] = None,
+                 vmax: Optional[Union[float, int]] = None
                  ):
         self.x1 = None
         self.x2 = None
@@ -120,8 +120,8 @@ class LineSelector:
 
     def gray_plot(self,
                   fig: matplotlib.figure.Figure,
-                  vmin: Optional[float, int] = None,
-                  vmax: Optional[float, int] = None,
+                  vmin: Optional[Union[float, int]] = None,
+                  vmax: Optional[Union[float, int]] = None,
                   return_ax: Optional[bool] = False):
         """
         Takes: a matplotlib.figure.Figure object and optional vmin and vmax
