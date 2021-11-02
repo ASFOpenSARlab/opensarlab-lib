@@ -89,7 +89,7 @@ def remove_nan_filled_tifs(tifs: List[Union[Path, str]]):
     removed = 0
     for tif in tifs:
         try:
-            raster = gdal.Open(tif)
+            raster = gdal.Open(str(tif))
         except TypeError:
             raise FileNotFoundError
 
