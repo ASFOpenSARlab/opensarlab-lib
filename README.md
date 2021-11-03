@@ -29,7 +29,7 @@ The opensarlab_lib can be installed with
 [comment]: <> (or into a virtual environment with)
 
 ```
-python -m pip install opensarlab_lib
+python -m pip install opensarlab-lib
 ```
 
 ## Contact Us
