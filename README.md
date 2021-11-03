@@ -1,8 +1,8 @@
 # opensarlab-lib
 
-[![PyPI license](https://img.shields.io/pypi/l/opensarlab_lib.svg)](https://pypi.python.org/pypi/opensarlab_lib/)
-[![PyPI pyversions](https://img.shields.io/pypi/pyversions/opensarlab_lib.svg)](https://pypi.python.org/pypi/opensarlab_lib/)
-[![PyPI version](https://img.shields.io/pypi/v/opensarlab_lib.svg)](https://pypi.python.org/pypi/opensarlab_lib/)
+[![PyPI license](https://img.shields.io/pypi/l/opensarlab_lib.svg)](https://pypi.python.org/pypi/opensarlab-lib/)
+[![PyPI pyversions](https://img.shields.io/pypi/pyversions/opensarlab_lib.svg)](https://pypi.python.org/pypi/opensarlab-lib/)
+[![PyPI version](https://img.shields.io/pypi/v/opensarlab_lib.svg)](https://pypi.python.org/pypi/opensarlab-lib/)
 
 [comment]: <> ([![Conda version]&#40;https://img.shields.io/conda/vn/conda-forge/opensarlab_lib&#41;]&#40;https://anaconda.org/conda-forge/opensarlab_lib&#41;)
 
