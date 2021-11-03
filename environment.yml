@@ -1,4 +1,4 @@
-yname: opensarlab_lib
+name: opensarlab_lib
 channels:
   - conda-forge
   - default
