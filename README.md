@@ -10,8 +10,6 @@
 
 A python library to support [ASF OpenSARlab's Jupyter Notebook repository](https://github.com/ASFOpenSARlab/opensarlab-notebooks)
 
-<<<<<<< HEAD
-=======
 ## Install
 
 In order to easily manage dependencies, we recommend using dedicated project environments with
@@ -38,4 +36,3 @@ python -m pip install opensarlab_lib
 
 Found a bug? Want to request a feature?
 [open an issue](https://github.com/ASFOpenSARlab/opensarlab-lib/issues/new)
->>>>>>> cde2e3c0d03dcf4e25cb917ed82f820f82d963fa
