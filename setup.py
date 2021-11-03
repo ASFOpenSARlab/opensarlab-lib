@@ -37,25 +37,23 @@ setup(
     ],
 
     packages=find_packages(),
-    python_requires='~=3.8',
+    python_requires='>=3.8',
 
     install_requires=[
         'numpy',
         'pyproj',
+        'asf_search',
+        'hyp3_sdk',
+        'IPython',
+        'ipywidgets',
+        'matplotlib',
+        'osgeo',
+        'pandas',
+        'pytest',
+        'pytest-cov',
+        'requests',
     ],
 
     extras_require={
-        'dev': [
-            'asf_search',
-            'hyp3_sdk',
-            'IPython',
-            'ipywidgets',
-            'matplotlib',
-            'osgeo',
-            'pandas',
-            'pytest',
-            'pytest-cov',
-            'requests',
-        ]
     },
 )
