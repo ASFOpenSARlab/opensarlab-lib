@@ -6,14 +6,9 @@ _HERE = os.path.abspath(os.path.dirname(__file__))
 with open(os.path.join(_HERE, 'README.md'), 'r') as f:
     long_desc = f.read()
 
-def local_scheme(version):
-    """Skip the local version (eg. +xyz of 0.6.1.dev4+gdf99fe2)
-    to be able to upload to Test PyPI"""
-    return ""
-
 setup(
     name='opensarlab_lib',
-    use_scm_version=True, #{"local_scheme": local_scheme},
+    use_scm_version=True,
     setup_requires=['setuptools_scm'],
     description="A Python library to support ASF OpenSARlab's Jupyter Notebook repository https://github.com/ASFOpenSARlab/opensarlab-notebooks",
     long_description=long_desc,
