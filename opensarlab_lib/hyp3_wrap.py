@@ -38,7 +38,7 @@ def filter_jobs_by_date(jobs: Batch, date_range: List[date]) -> Batch:
     return remaining_jobs
 
 
-def get_paths_orbits(jobs: Batch):
+def set_paths_orbits(jobs: Batch):
     """
     Takes: a Batch of HyP3 Jobs
 
