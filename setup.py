@@ -13,7 +13,8 @@ def local_scheme(version):
 
 setup(
     name='opensarlab_lib',
-    use_scm_version={"local_scheme": local_scheme},
+    use_scm_version=True, #{"local_scheme": local_scheme},
+    setup_requires=['setuptools_scm'],
     description="A Python library to support ASF OpenSARlab's Jupyter Notebook repository https://github.com/ASFOpenSARlab/opensarlab-notebooks",
     long_description=long_desc,
     long_description_content_type='text/markdown',
