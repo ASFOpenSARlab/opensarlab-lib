@@ -37,18 +37,20 @@ setup(
     install_requires=[
         'numpy',
         'pyproj',
-        'asf_search',
-        'hyp3_sdk',
-        'IPython',
-        'ipywidgets',
-        'matplotlib',
-        'gdal',
-        'pandas',
-        'pytest',
-        'pytest-cov',
-        'requests',
     ],
 
     extras_require={
+        'dev': [
+            'asf_search',
+            'hyp3_sdk',
+            'IPython',
+            'ipywidgets',
+            'matplotlib',
+            'osgeo',
+            'pandas',
+            'pytest',
+            'pytest-cov',
+            'requests',
+        ]
     },
 )
