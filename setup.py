@@ -42,7 +42,7 @@ setup(
         'IPython',
         'ipywidgets',
         'matplotlib',
-        'osgeo',
+        'gdal',
         'pandas',
         'pytest',
         'pytest-cov',
