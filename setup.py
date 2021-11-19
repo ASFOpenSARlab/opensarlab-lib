@@ -41,7 +41,7 @@ setup(
         'hyp3_sdk',
         'IPython',
         'ipywidgets',
-        'matplotlib-base',
+        'matplotlib',
         'osgeo',
         'pandas',
         'requests',
