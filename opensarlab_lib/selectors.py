@@ -1,10 +1,12 @@
-import numpy as np
-from typing import Optional, Union
+from typing import List, Optional, Union
 
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.widgets import RectangleSelector
 import matplotlib.patches as patches
+
+import cartopy.crs as ccrs
+import numpy as np
 
 plt.rcParams.update({'font.size': 12})
 
@@ -19,31 +21,70 @@ class AOI_Selector:
     to select an area-of-interest with a bounding box
     """
 
-    def __init__(self, image: np.ndarray,
-                 fig_xsize: Optional[Union[float, int]] = None, fig_ysize: Optional[Union[float, int]] = None,
-                 cmap: Optional[matplotlib.colors.LinearSegmentedColormap] = plt.cm.gist_gray,
-                 vmin: Optional[Union[float, int]] = None, vmax: Optional[Union[float, int]] = None,
-                 drawtype: Optional[str] = 'box'
-                 ):
-        self.image = image
+    def __init__(self, extents: List[Union[float, int]],
+                 common_extents: Optional[List[Union[float, int]]] = None,
+                 fig_xsize: Optional[Union[float, int]] = None, 
+                 fig_ysize: Optional[Union[float, int]] = None):
+        """
+        Args:
+            extents: web mercator (EPSG: 3857) raster extents [xmin, ymin, xmax, ymax]
+            fig_xsize: (optional) matplotlib figure size in x dimension
+            fig_ysize: (optional) matplotlib figure size in y dimension
+            drawtype: (optional) matplotlib RectangleSelector draw type
+            
+        """
+        
         self.x1 = None
         self.y1 = None
         self.x2 = None
         self.y2 = None
-        if not vmin:
-            self.vmin = np.nanpercentile(self.image, 1)
-        else:
-            self.vmin = vmin
-        if not vmax:
-            self.vmax = np.nanpercentile(self.image, 99)
-        else:
-            self.vmax = vmax
+        self.extents = extents
+        self.common_extents = common_extents
+       
         if fig_xsize and fig_ysize:
-            self.fig, self.current_ax = plt.subplots(figsize=(fig_xsize, fig_ysize))
+            self.fig = plt.figure(figsize=(fig_xsize, fig_ysize))
         else:
-            self.fig, self.current_ax = plt.subplots()
+            self.fig = plt.figure()
+            
+        self.ax = self.fig.add_subplot(1,1,1, projection=crs.Mercator())
+        self.ax.stock_img()
+        self.ax.add_feature(cfeature.BORDERS)
+        self.ax.add_feature(cfeature.COASTLINE)
+        
+        x_padding = (self.extents[2] - self.extents[0]) / 10
+        y_padding = (self.extents[3] - self.extents[1]) / 10
+        
+        self.ax.set_extent(
+            [
+                self.extents[0]-x_padding, # minimum latitude
+                self.extents[2]+x_padding, # max latitude
+                self.extents[1]-y_padding, # min longitude
+                self.extents[3]+y_padding # max longitude
+            ],
+            crs=crs.Mercator()
+        )
+        
+        gl = self.ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
+                  linewidth=2, color='gray', alpha=0.5, linestyle='--')
+        
+        stack_extents = self.ax.add_patch(patches.Rectangle((self.extents[0], self.extents[3]),
+                                                         self.extents[2] - self.extents[0], self.extents[1] - self.extents[3],
+                                                         fill=False, edgecolor='orange', 
+                                                         label='Max area covered by data stack'))
+        extent_handles = [stack_extents]
+        
+        if self.common_extents:
+            stack_common_extents = self.ax.add_patch(patches.Rectangle((self.common_extents[0], self.common_extents[3]),
+                                                             self.common_extents[2] - self.common_extents[0], 
+                                                             self.common_extents[1] - self.common_extents[3], 
+                                                             fill=False, edgecolor='green', 
+                                                             label='Common area covered by data stack')) 
+            extent_handles.append(stack_common_extents)
+        
+        self.ax.legend(handles=extent_handles)
+            
         self.fig.suptitle('Area-Of-Interest Selector', fontsize=16)
-        self.current_ax.imshow(self.image, cmap=cmap, vmin=self.vmin, vmax=self.vmax)
+        plt.show()
 
         def toggle_selector(event: matplotlib.backend_bases.Event):
             """
@@ -57,12 +98,12 @@ class AOI_Selector:
             if event.key in ['A', 'a'] and not toggle_selector.RS.active:
                 toggle_selector.RS.set_active(True)
 
-        toggle_selector.RS = RectangleSelector(self.current_ax, self.line_select_callback,
-                                               drawtype=drawtype, useblit=True,
+        toggle_selector.RS = RectangleSelector(self.ax, self.line_select_callback,
+                                               useblit=True,
                                                button=[1, 3],  # don't use middle button
                                                minspanx=0, minspany=0,
                                                spancoords='pixels',
-                                               rectprops=dict(facecolor='red', edgecolor='yellow',
+                                               props=dict(facecolor='red', edgecolor='yellow',
                                                               alpha=0.3, fill=True),
                                                interactive=True)
         plt.connect('key_press_event', toggle_selector)
@@ -78,7 +119,6 @@ class AOI_Selector:
 
         self.x1, self.y1 = eclick.xdata, eclick.ydata
         self.x2, self.y2 = erelease.xdata, erelease.ydata
-
 
 ##################
 #  Line Selector #
