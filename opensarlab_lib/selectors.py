@@ -5,7 +5,8 @@ import matplotlib.pyplot as plt
 from matplotlib.widgets import RectangleSelector
 import matplotlib.patches as patches
 
-import cartopy.crs as ccrs
+import cartopy.crs
+import cartopy.feature as cfeature
 import numpy as np
 
 plt.rcParams.update({'font.size': 12})
@@ -46,7 +47,7 @@ class AOI_Selector:
         else:
             self.fig = plt.figure()
             
-        self.ax = self.fig.add_subplot(1,1,1, projection=crs.Mercator())
+        self.ax = self.fig.add_subplot(1,1,1, projection=cartopy.crs.Mercator())
         self.ax.stock_img()
         self.ax.add_feature(cfeature.BORDERS)
         self.ax.add_feature(cfeature.COASTLINE)
@@ -61,10 +62,10 @@ class AOI_Selector:
                 self.extents[1]-y_padding, # min longitude
                 self.extents[3]+y_padding # max longitude
             ],
-            crs=crs.Mercator()
+            crs=cartopy.crs.Mercator()
         )
         
-        gl = self.ax.gridlines(crs=ccrs.PlateCarree(), draw_labels=True,
+        gl = self.ax.gridlines(crs=cartopy.crs.PlateCarree(), draw_labels=True,
                   linewidth=2, color='gray', alpha=0.5, linestyle='--')
         
         stack_extents = self.ax.add_patch(patches.Rectangle((self.extents[0], self.extents[3]),

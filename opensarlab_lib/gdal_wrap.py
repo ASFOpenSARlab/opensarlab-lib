@@ -99,3 +99,39 @@ def remove_nan_filled_tifs(tifs: List[Union[Path, str]]):
             removed += 1
     print(f"GeoTiffs Examined: {len(tifs)}")
     print(f"GeoTiffs Removed:  {removed}")
+    
+    
+def get_max_extents(tifs: List[Union[Path, str]]):
+    """
+    Finds the total footprint covered by a stack of geotiffs
+    
+    tifs: list of string or posix paths to a stack of geotiffs
+    
+    returns: extents for the total footprint covered by a stack of geotiffs
+             in the format [upper-left-x, lower-right-y, lower-right-x, upper-left-y]
+    
+    """
+    corners = [gdal.Info(str(tif), format='json')['cornerCoordinates'] for tif in tifs]
+    ulx = min(corner['upperLeft'][0] for corner in corners)
+    uly = max(corner['upperLeft'][1] for corner in corners)
+    lrx = max(corner['lowerRight'][0] for corner in corners)
+    lry = min(corner['lowerRight'][1] for corner in corners)
+    return [ulx, lry, lrx, uly]
+
+
+def get_common_coverage_extents(tifs: List[Union[Path, str]]):
+    """
+    Finds the footprint for the area of shared coverage for a stack of geotiffs
+    
+    tifs: list of string or posix paths to a stack of geotiffs
+    
+    returns: extents for the area of shared coverage for a stack of geotiffs
+             in the format [upper-left-x, lower-right-y, lower-right-x, upper-left-y]
+    
+    """
+    corners = [gdal.Info(str(tif), format='json')['cornerCoordinates'] for tif in tifs]
+    ulx = max(corner['upperLeft'][0] for corner in corners)
+    uly = min(corner['upperLeft'][1] for corner in corners)
+    lrx = min(corner['lowerRight'][0] for corner in corners)
+    lry = max(corner['lowerRight'][1] for corner in corners)
+    return [ulx, lry, lrx, uly]
