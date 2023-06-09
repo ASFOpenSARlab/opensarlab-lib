@@ -7,7 +7,7 @@ from importlib.metadata import PackageNotFoundError, version
 
 from .config import TESTING
 from .custom_exceptions import *
-from .selectors import *
+from .aoi_selectors import *
 from .gdal_wrap import *
 from .hyp3_wrap import *
 from .util import *
