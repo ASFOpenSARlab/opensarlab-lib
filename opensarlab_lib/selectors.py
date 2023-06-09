@@ -1,4 +1,4 @@
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Tuple
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -24,14 +24,14 @@ class AOI_Selector:
 
     def __init__(self, extents: List[Union[float, int]],
                  common_extents: Optional[List[Union[float, int]]] = None,
-                 fig_xsize: Optional[Union[float, int]] = None, 
-                 fig_ysize: Optional[Union[float, int]] = None):
+                 figsize: Optional[Tuple[int]]=None):
         """
         Args:
-            extents: web mercator (EPSG: 3857) raster extents [xmin, ymin, xmax, ymax]
-            fig_xsize: (optional) matplotlib figure size in x dimension
-            fig_ysize: (optional) matplotlib figure size in y dimension
-            drawtype: (optional) matplotlib RectangleSelector draw type
+            extents:        web mercator (EPSG: 3857) max raster extents of entire stack [xmin, ymin, xmax, ymax]
+                            (guaranteed to contain data in at least one raster)
+            common_extents: web mercator (EPSG: 3857) raster extents common to entire stack [xmin, ymin, xmax, ymax]
+                            (guaranteed to contain data in all rasters)
+            figsize: a tuple containing the figure size of the output plot in the format (x_size, y_size)
             
         """
         
@@ -41,12 +41,7 @@ class AOI_Selector:
         self.y2 = None
         self.extents = extents
         self.common_extents = common_extents
-       
-        if fig_xsize and fig_ysize:
-            self.fig = plt.figure(figsize=(fig_xsize, fig_ysize))
-        else:
-            self.fig = plt.figure()
-            
+        self.fig = plt.figure(figsize=figsize)     
         self.ax = self.fig.add_subplot(1,1,1, projection=cartopy.crs.Mercator())
         self.ax.stock_img()
         self.ax.add_feature(cfeature.BORDERS)
@@ -132,8 +127,7 @@ class LineSelector:
     """
 
     def __init__(self, image: np.ndarray,
-                 fig_xsize: Optional[Union[float, int]] = None,
-                 fig_ysize: Optional[Union[float, int]] = None,
+                 figsize: Optional[Tuple[int]]=None,
                  cmap: Optional[matplotlib.colors.LinearSegmentedColormap] = plt.cm.gist_gray,
                  vmin: Optional[Union[float, int]] = None,
                  vmax: Optional[Union[float, int]] = None
@@ -146,7 +140,7 @@ class LineSelector:
         self.pnt1 = None
         self.pnt2 = None
 
-        self.fig = plt.figure(figsize=(fig_xsize, fig_ysize))
+        self.fig = plt.figure(figsize=figsize)
         self.ax = self.fig.add_subplot(111, visible=False)
         self.rect = patches.Rectangle(
             (0.0, 0.0), fig_xsize, fig_ysize,
