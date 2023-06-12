@@ -24,7 +24,7 @@ class AOI_Selector:
 
     def __init__(self, extents: List[Union[float, int]],
                  common_extents: Optional[List[Union[float, int]]] = None,
-                 figsize: Optional[Tuple[int]]=None):
+                 figsize: Optional[Tuple[int]]=(10,8)):
         """
         Args:
             extents:        web mercator (EPSG: 3857) max raster extents of entire stack [xmin, ymin, xmax, ymax]
@@ -127,7 +127,7 @@ class LineSelector:
     """
 
     def __init__(self, image: np.ndarray,
-                 figsize: Optional[Tuple[int]]=None,
+                 figsize: Optional[Tuple[int]]=(10,8),
                  cmap: Optional[matplotlib.colors.LinearSegmentedColormap] = plt.cm.gist_gray,
                  vmin: Optional[Union[float, int]] = None,
                  vmax: Optional[Union[float, int]] = None
@@ -143,8 +143,9 @@ class LineSelector:
         self.fig = plt.figure(figsize=figsize)
         self.ax = self.fig.add_subplot(111, visible=False)
         self.rect = patches.Rectangle(
-            (0.0, 0.0), fig_xsize, fig_ysize,
+            (0.0, 0.0), figsize[0], figsize[1],
             fill=False, clip_on=False, visible=False)
+        
         self.rect_patch = self.ax.add_patch(self.rect)
         self.cid = self.rect_patch.figure.canvas.mpl_connect('button_press_event',
                                                              self)
