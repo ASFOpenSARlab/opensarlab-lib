@@ -7,12 +7,13 @@ from importlib.metadata import PackageNotFoundError, version
 
 from .config import TESTING
 from .custom_exceptions import *
-from .selectors import *
+from .aoi_selectors import *
 from .gdal_wrap import *
 from .hyp3_wrap import *
 from .util import *
 from .widgets import *
 from .product_name_parse import *
+from .plot import *
 
 try:
     __version__ = version(__name__)
