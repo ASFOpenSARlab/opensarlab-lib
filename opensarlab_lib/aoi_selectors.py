@@ -84,12 +84,9 @@ class AOI_Selector:
 
         zoom_level = 10
         self.ax.add_image(esri_tiler, zoom_level)
-
         self.ax.add_image(osm_tiler, zoom_level, alpha=0.5)
-
         self.ax.add_feature(cfeature.BORDERS)
         self.ax.add_feature(cfeature.COASTLINE)
-
  
         gl = self.ax.gridlines(crs=cartopy.crs.PlateCarree(), draw_labels=True,
                                linewidth=1, color='gray', alpha=0.5, linestyle='--')
