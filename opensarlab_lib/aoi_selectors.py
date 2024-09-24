@@ -12,6 +12,7 @@ import pyproj
 
 plt.rcParams.update({'font.size': 12})
 
+
 class EsriImagery(GoogleTiles):
     def _image_url(self, tile):
         x, y, z = tile
@@ -32,9 +33,11 @@ class AOI_Selector:
     to select an area-of-interest with a bounding box
     """
 
-    def __init__(self, extents: List[Union[float, int]],
-                 common_extents: Optional[List[Union[float, int]]] = None,
-                 figsize: Optional[Tuple[int]]=(10,8)):
+    def __init__(
+        self, extents: List[Union[float, int]],
+        common_extents: Optional[List[Union[float, int]]] = None,
+        figsize: Optional[Tuple[int]] = (10, 8)
+    ):
         """
         Args:
             extents:        web mercator (EPSG:3857) max raster extents of entire stack [xmin, ymin, xmax, ymax]
@@ -67,7 +70,7 @@ class AOI_Selector:
         esri_tiler = EsriImagery()
         osm_tiler = OSM()
 
-        self.ax = self.fig.add_subplot(1,1,1, projection=esri_tiler.crs)
+        self.ax = self.fig.add_subplot(1, 1, 1, projection=esri_tiler.crs)
 
         x_padding = (self.extents[1] - self.extents[0]) / 10
         y_padding = (self.extents[3] - self.extents[2]) / 10
@@ -159,18 +162,20 @@ class AOI_Selector:
 #  Line Selector #
 ##################
 
+
 class LineSelector:
     """
     Creates an interactive matplotlib plot allowing users
     to define a line by selecting 2 points
     """
 
-    def __init__(self, image: np.ndarray,
-                 figsize: Optional[Tuple[int]]=(10,8),
-                 cmap: Optional[matplotlib.colors.LinearSegmentedColormap] = plt.cm.gist_gray,
-                 vmin: Optional[Union[float, int]] = None,
-                 vmax: Optional[Union[float, int]] = None
-                 ):
+    def __init__(
+        self, image: np.ndarray,
+        figsize: Optional[Tuple[int]] = (10, 8),
+        cmap: Optional[matplotlib.colors.LinearSegmentedColormap] = plt.cm.gist_gray,
+        vmin: Optional[Union[float, int]] = None,
+        vmax: Optional[Union[float, int]] = None
+    ):
         self.x1 = None
         self.x2 = None
         self.y1 = None
