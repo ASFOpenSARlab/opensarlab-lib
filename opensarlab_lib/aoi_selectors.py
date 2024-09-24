@@ -17,8 +17,8 @@ class EsriImagery(GoogleTiles):
         x, y, z = tile
         url = (
             'https://server.arcgisonline.com/ArcGIS/rest/services/'
-            'World_Imagery/MapServer/tile/{z}/{y}/{x}'
-        ).format(z=z, y=y, x=x)
+            f'World_Imagery/MapServer/tile/{z}/{y}/{x}'
+        )
         return url
 
 
