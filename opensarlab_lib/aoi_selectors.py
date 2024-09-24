@@ -1,15 +1,25 @@
 from typing import List, Optional, Union, Tuple
 
+import cartopy.crs
+import cartopy.feature as cfeature
+from cartopy.io.img_tiles import GoogleTiles, OSM
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.widgets import RectangleSelector
 import matplotlib.patches as patches
-
-import cartopy.crs
-import cartopy.feature as cfeature
 import numpy as np
+import pyproj
 
 plt.rcParams.update({'font.size': 12})
+
+class EsriImagery(GoogleTiles):
+    def _image_url(self, tile):
+        x, y, z = tile
+        url = (
+            'https://server.arcgisonline.com/ArcGIS/rest/services/'
+            f'World_Imagery/MapServer/tile/{z}/{y}/{x}'
+        )
+        return url
 
 
 ########################
@@ -27,9 +37,9 @@ class AOI_Selector:
                  figsize: Optional[Tuple[int]]=(10,8)):
         """
         Args:
-            extents:        web mercator (EPSG: 3857) max raster extents of entire stack [xmin, ymin, xmax, ymax]
+            extents:        web mercator (EPSG:3857) max raster extents of entire stack [xmin, ymin, xmax, ymax]
                             (guaranteed to contain data in at least one raster)
-            common_extents: web mercator (EPSG: 3857) raster extents common to entire stack [xmin, ymin, xmax, ymax]
+            common_extents: web mercator (EPSG:3857) raster extents common to entire stack [xmin, ymin, xmax, ymax]
                             (guaranteed to contain data in all rasters)
             figsize: a tuple containing the figure size of the output plot in the format (x_size, y_size)
             
@@ -39,44 +49,73 @@ class AOI_Selector:
         self.y1 = None
         self.x2 = None
         self.y2 = None
-        self.extents = extents
-        self.common_extents = common_extents
+
+        transformer = pyproj.Transformer.from_crs("EPSG:3857", "EPSG:4326", always_xy=True)
+        min_lon, min_lat = transformer.transform(extents[0], extents[1])
+        max_lon, max_lat = transformer.transform(extents[2], extents[3])
+        self.extents = [min_lon, max_lon, min_lat, max_lat]
+
+        if common_extents:
+            min_lon_c, min_lat_c = transformer.transform(common_extents[0], common_extents[1])
+            max_lon_c, max_lat_c = transformer.transform(common_extents[2], common_extents[3])
+            self.common_extents = [min_lon_c, max_lon_c, min_lat_c, max_lat_c]
+        else:
+            self.common_extents = None
+
         self.fig = plt.figure(figsize=figsize)     
-        self.ax = self.fig.add_subplot(1,1,1, projection=cartopy.crs.Mercator())
-        self.ax.stock_img()
-        self.ax.add_feature(cfeature.BORDERS)
-        self.ax.add_feature(cfeature.COASTLINE)
-        
-        x_padding = (self.extents[2] - self.extents[0]) / 10
-        y_padding = (self.extents[3] - self.extents[1]) / 10
-        
+
+        esri_tiler = EsriImagery()
+        osm_tiler = OSM()
+
+        self.ax = self.fig.add_subplot(1,1,1, projection=esri_tiler.crs)
+
+        x_padding = (self.extents[1] - self.extents[0]) / 10
+        y_padding = (self.extents[3] - self.extents[2]) / 10
+
         self.ax.set_extent(
             [
-                self.extents[0]-x_padding, # minimum latitude
-                self.extents[2]+x_padding, # max latitude
-                self.extents[1]-y_padding, # min longitude
-                self.extents[3]+y_padding # max longitude
+                self.extents[0] - x_padding,  # min longitude
+                self.extents[1] + x_padding,  # max longitude
+                self.extents[2] - y_padding,  # min latitude
+                self.extents[3] + y_padding   # max latitude
             ],
-            crs=cartopy.crs.Mercator()
+            crs=cartopy.crs.PlateCarree()
         )
-        
+
+        zoom_level = 10
+        self.ax.add_image(esri_tiler, zoom_level)
+        self.ax.add_image(osm_tiler, zoom_level, alpha=0.5)
+        self.ax.add_feature(cfeature.BORDERS)
+        self.ax.add_feature(cfeature.COASTLINE)
+ 
         gl = self.ax.gridlines(crs=cartopy.crs.PlateCarree(), draw_labels=True,
-                  linewidth=2, color='gray', alpha=0.5, linestyle='--')
-        
-        stack_extents = self.ax.add_patch(patches.Rectangle((self.extents[0], self.extents[3]),
-                                                         self.extents[2] - self.extents[0], self.extents[1] - self.extents[3],
-                                                         fill=False, edgecolor='orange', 
-                                                         label='Max area covered by data stack'))
-        extent_handles = [stack_extents]
-        
+                               linewidth=1, color='gray', alpha=0.5, linestyle='--')
+        gl.top_labels = False
+        gl.right_labels = False
+
+        stack_rect = patches.Rectangle(
+            (self.extents[0], self.extents[2]),
+            self.extents[1] - self.extents[0],
+            self.extents[3] - self.extents[2],
+            fill=False, edgecolor='orange',
+            label='Max area covered by data stack',
+            transform=cartopy.crs.PlateCarree()
+        )
+        self.ax.add_patch(stack_rect)
+        extent_handles = [stack_rect]
+
         if self.common_extents:
-            stack_common_extents = self.ax.add_patch(patches.Rectangle((self.common_extents[0], self.common_extents[3]),
-                                                             self.common_extents[2] - self.common_extents[0], 
-                                                             self.common_extents[1] - self.common_extents[3], 
-                                                             fill=False, edgecolor='green', 
-                                                             label='Common area covered by data stack')) 
-            extent_handles.append(stack_common_extents)
-        
+            common_stack_rect = patches.Rectangle(
+                (self.common_extents[0], self.common_extents[2]),
+                self.common_extents[1] - self.common_extents[0],
+                self.common_extents[3] - self.common_extents[2],
+                fill=False, edgecolor='green',
+                label='Common area covered by data stack',
+                transform=cartopy.crs.PlateCarree()
+            )
+            self.ax.add_patch(common_stack_rect)
+            extent_handles.append(common_stack_rect)
+
         self.ax.legend(handles=extent_handles)
             
         self.fig.suptitle('Area-Of-Interest Selector', fontsize=16)
@@ -100,7 +139,7 @@ class AOI_Selector:
                                                minspanx=0, minspany=0,
                                                spancoords='pixels',
                                                props=dict(facecolor='red', edgecolor='yellow',
-                                                              alpha=0.3, fill=True),
+                                                          alpha=0.3, fill=True),
                                                interactive=True)
         plt.connect('key_press_event', toggle_selector)
 
