@@ -33,6 +33,7 @@ setup(
     install_requires=[
         "asf_search",
         "cartopy",
+        "contextily",
         "gdal",
         "hyp3_sdk",
         "ipywidgets",

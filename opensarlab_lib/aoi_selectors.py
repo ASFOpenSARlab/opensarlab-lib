@@ -1,8 +1,7 @@
 from typing import List, Optional, Union, Tuple
 
 import cartopy.crs
-import cartopy.feature as cfeature
-from cartopy.io.img_tiles import GoogleTiles, OSM
+import contextily as ctx
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.widgets import RectangleSelector
@@ -11,17 +10,6 @@ import numpy as np
 import pyproj
 
 plt.rcParams.update({'font.size': 12})
-
-
-class EsriImagery(GoogleTiles):
-    def _image_url(self, tile):
-        x, y, z = tile
-        url = (
-            'https://server.arcgisonline.com/ArcGIS/rest/services/'
-            f'World_Imagery/MapServer/tile/{z}/{y}/{x}'
-        )
-        return url
-
 
 ########################
 #  Subset AOI Selector #
@@ -67,10 +55,7 @@ class AOI_Selector:
 
         self.fig = plt.figure(figsize=figsize)     
 
-        esri_tiler = EsriImagery()
-        osm_tiler = OSM()
-
-        self.ax = self.fig.add_subplot(1, 1, 1, projection=esri_tiler.crs)
+        self.ax = self.fig.add_subplot(1, 1, 1, projection=cartopy.crs.epsg(3857))
 
         x_padding = (self.extents[1] - self.extents[0]) / 10
         y_padding = (self.extents[3] - self.extents[2]) / 10
@@ -85,12 +70,8 @@ class AOI_Selector:
             crs=cartopy.crs.PlateCarree()
         )
 
-        zoom_level = 10
-        self.ax.add_image(esri_tiler, zoom_level)
-        self.ax.add_image(osm_tiler, zoom_level, alpha=0.5)
-        self.ax.add_feature(cfeature.BORDERS)
-        self.ax.add_feature(cfeature.COASTLINE)
- 
+        ctx.add_basemap(self.ax, crs="EPSG:3857", source=ctx.providers.Esri.WorldImagery)
+        ctx.add_basemap(self.ax, crs="EPSG:3857", source=ctx.providers.OpenStreetMap.Mapnik, alpha=0.5)
         gl = self.ax.gridlines(crs=cartopy.crs.PlateCarree(), draw_labels=True,
                                linewidth=1, color='gray', alpha=0.5, linestyle='--')
         gl.top_labels = False
