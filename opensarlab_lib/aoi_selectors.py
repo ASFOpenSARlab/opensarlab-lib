@@ -9,6 +9,8 @@ import matplotlib.patches as patches
 import numpy as np
 import pyproj
 
+plt.rcParams.update({'font.size': 12})
+
 ########################
 #  Subset AOI Selector #
 ########################
