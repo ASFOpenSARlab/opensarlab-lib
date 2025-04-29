@@ -1,6 +1,48 @@
 [build-system]
-requires = ["setuptools>=42", "wheel", "setuptools_scm[toml]>=3.4"]
+requires = [
+  "setuptools>=61",
+  "setuptools_scm[toml]>=6.3",
+  "wheel"
+]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "opensarlab_lib"
+description = "A Python library to support ASF OpenSARlab's Jupyter Notebook repository https://github.com/ASFOpenSARlab/opensarlab-notebooks"
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [
+  { name = "ASF OpenSARlab Team", email = "uaf-jupyterhub-asf@alaska.edu" }
+]
+requires-python = ">=3.9"
+dynamic = ["version"]
+
+dependencies = [
+  "asf_search",
+  "cartopy",
+  "contextily",
+  "gdal",
+  "hyp3_sdk",
+  "ipywidgets",
+  "IPython",
+  "matplotlib",
+  "numpy",
+  "pandas",
+  "pyproj",
+  "requests",
+  "shapely",
+  "pyshp"
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "pytest-cov"]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["opensarlab_lib*"]
+
 [tool.setuptools_scm]
-write_to = "_version.py"
+write_to = "opensarlab_lib/_version.py"
