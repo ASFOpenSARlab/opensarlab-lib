@@ -10,7 +10,7 @@ build-backend = "setuptools.build_meta"
 name = "opensarlab_lib"
 description = "A Python library to support ASF OpenSARlab's Jupyter Notebook repository https://github.com/ASFOpenSARlab/opensarlab-notebooks"
 readme = "README.md"
-license = { file = "LICENSE" }
+license = "BSD-3-Clause"
 authors = [
   { name = "ASF OpenSARlab Team", email = "uaf-jupyterhub-asf@alaska.edu" }
 ]
